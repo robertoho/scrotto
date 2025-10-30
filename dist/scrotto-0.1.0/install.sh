@@ -61,18 +61,71 @@ if command -v update-desktop-database >/dev/null 2>&1; then
     update-desktop-database ~/.local/share/applications/ 2>/dev/null || true
 fi
 
+# Set up keyboard shortcut automatically
+print_info "Setting up keyboard shortcut (Shift+Super+T)"
+setup_keyboard_shortcut() {
+    # Check if we're in a GNOME environment
+    if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* ]] || command -v gsettings >/dev/null 2>&1; then
+        # Find an available custom keybinding slot
+        local slot_found=""
+        for i in {0..30}; do
+            local existing_name=$(gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$i/ name 2>/dev/null)
+            if [[ "$existing_name" == "''" ]] || [[ -z "$existing_name" ]]; then
+                slot_found="custom$i"
+                break
+            fi
+        done
+        
+        if [[ -n "$slot_found" ]]; then
+            # Get current custom keybindings list
+            local current_bindings=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
+            local keybinding_path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/$slot_found/"
+            
+            # Add our keybinding path if not already present
+            if [[ "$current_bindings" != *"$keybinding_path"* ]]; then
+                if [[ "$current_bindings" == "@as []" ]]; then
+                    # Empty list
+                    gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$keybinding_path']"
+                else
+                    # Add to existing list - remove the closing bracket, add our path, then add the bracket back
+                    local new_bindings="${current_bindings%]*}, '$keybinding_path']"
+                    gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_bindings"
+                fi
+            fi
+            
+            # Set the keybinding properties
+            gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$keybinding_path name "Scrotto"
+            gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$keybinding_path command "$HOME/.local/bin/scrotto"
+            gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$keybinding_path binding "<Shift><Super>t"
+            
+            print_status "Keyboard shortcut created: Shift+Super+T"
+            return 0
+        else
+            print_warning "No available keybinding slots found"
+            return 1
+        fi
+    else
+        print_warning "GNOME environment not detected, skipping automatic keybinding setup"
+        return 1
+    fi
+}
+
+# Try to set up keyboard shortcut
+if ! setup_keyboard_shortcut; then
+    print_info "Manual keyboard shortcut setup:"
+    echo "  1. Go to Settings > Keyboard > View and Customize Shortcuts"
+    echo "  2. Scroll to 'Custom Shortcuts' and click '+'"
+    echo "  3. Name: Scrotto"
+    echo "  4. Command: $HOME/.local/bin/scrotto"
+    echo "  5. Set shortcut: Shift+Super+T"
+fi
+
 print_status "Installation completed successfully!"
 echo ""
 print_info "Usage:"
 echo "  scrotto           # Select area to capture text"
 echo "  scrotto --full    # Capture entire screen"
-echo ""
-print_info "Set up keyboard shortcuts:"
-echo "  1. Go to Settings > Keyboard > View and Customize Shortcuts"
-echo "  2. Scroll to 'Custom Shortcuts' and click '+'"
-echo "  3. Name: Scrotto"
-echo "  4. Command: $HOME/.local/bin/scrotto"
-echo "  5. Set your preferred shortcut (e.g., Shift+Super+T)"
+echo "  Shift+Super+T     # Keyboard shortcut (if setup succeeded)"
 echo ""
 print_info "Requirements (install if needed):"
 echo "  • sudo apt install gnome-screenshot tesseract-ocr"
