@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Development Build Script for Screen Text Grabber
+# Development Build Script for Scrotto
 # Simple script for development builds and testing
 
 set -e
@@ -11,7 +11,7 @@ BLUE='\033[0;34m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${BLUE}🔨 Building Screen Text Grabber (Development)${NC}"
+echo -e "${BLUE}🔨 Building Scrotto (Development)${NC}"
 echo "=============================================="
 
 # Check if Cargo.toml exists
@@ -25,14 +25,14 @@ echo -e "${BLUE}📦 Building in release mode...${NC}"
 cargo build --release
 
 # Check if build succeeded
-if [[ -f "target/release/screen_text_grabber" ]]; then
+if [[ -f "target/release/scrotto" ]]; then
     echo -e "${GREEN}✅ Build completed successfully!${NC}"
     echo ""
-    echo "📍 Binary location: target/release/screen_text_grabber"
+    echo "📍 Binary location: target/release/scrotto"
     echo ""
     echo "🎯 Quick test commands:"
-    echo "  ./target/release/screen_text_grabber        # Area selection mode"
-    echo "  ./target/release/screen_text_grabber --full # Full screen mode"
+    echo "  ./target/release/scrotto        # Area selection mode"
+    echo "  ./target/release/scrotto --full # Full screen mode"
 else
     echo -e "${RED}❌ Build failed - binary not found${NC}"
     exit 1

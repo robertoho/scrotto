@@ -1,4 +1,4 @@
-# Screen Text Grabber
+# Scrotto
 
 A fast and efficient screen text grabber for Ubuntu Wayland that captures selected areas and extracts text using OCR.
 
@@ -31,8 +31,8 @@ A fast and efficient screen text grabber for Ubuntu Wayland that captures select
 
 ### Usage
 ```bash
-screen_text_grabber           # Select area to capture
-screen_text_grabber --full    # Capture full screen
+scrotto           # Select area to capture
+scrotto --full    # Capture full screen
 
 # Or use keyboard shortcuts (after setup):
 # Shift+Super+T        → Area selection
@@ -51,7 +51,7 @@ The application automatically detects and works with:
 
 ### Area Selection Mode (Default)
 ```bash
-./target/release/screen_text_grabber
+./target/release/scrotto
 ```
 - Shows an overlay with crosshair cursor
 - Click and drag to select area
@@ -60,7 +60,7 @@ The application automatically detects and works with:
 
 ### Full Screen Mode
 ```bash
-./target/release/screen_text_grabber --full
+./target/release/scrotto --full
 ```
 - Captures entire screen
 - Extracts all visible text
@@ -87,13 +87,13 @@ The application automatically detects and works with:
 1. Open **Settings** → **Keyboard** → **View and Customize Shortcuts**
 2. Scroll to **Custom Shortcuts** → Click **+**
 3. Add shortcuts:
-   - **Name**: Screen Text Grabber - Area
-   - **Command**: `~/.local/bin/screen_text_grabber`
+   - **Name**: Scrotto - Area
+   - **Command**: `~/.local/bin/scrotto`
    - **Shortcut**: `Shift+Super+T`
    
 4. Add second shortcut:
-   - **Name**: Screen Text Grabber - Full Screen  
-   - **Command**: `~/.local/bin/screen_text_grabber --full`
+   - **Name**: Scrotto - Full Screen  
+   - **Command**: `~/.local/bin/scrotto --full`
    - **Shortcut**: `Shift+Super+Alt+T`
 
 ## 🛠️ Technical Details
@@ -127,7 +127,7 @@ screenshots = "0.3"    # Cross-platform screenshot support
 - For other languages: `sudo apt install tesseract-ocr-[language]`
 
 ### Permission issues
-- Make sure binary is executable: `chmod +x screen_text_grabber`
+- Make sure binary is executable: `chmod +x scrotto`
 - Check clipboard permissions in Wayland
 
 ## 📝 Build from Source
@@ -135,10 +135,10 @@ screenshots = "0.3"    # Cross-platform screenshot support
 ```bash
 # Clone and build
 git clone <repository>
-cd screen_text_grabber
+cd scrotto
 cargo build --release
 
-# The binary will be at: target/release/screen_text_grabber
+# The binary will be at: target/release/scrotto
 ```
 
 ## 🎯 Perfect for:
@@ -148,4 +148,4 @@ cargo build --release
 - **Researchers**: Digitize printed text, screenshots
 - **General Users**: Quick text extraction from any screen content
 
-The application provides a seamless workflow: select area → automatic OCR → text in clipboard → paste anywhere!
+The application provides a seamless workflow: select area → automatic OCR → text in clipboard → paste anywhere!# scrotto

@@ -1,5 +1,5 @@
 [package]
-name = "screen_text_grabber"
+name = "scrotto"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,6 @@ edition = "2021"
 clipboard = "0.5"
 notify-rust = "4"
 screenshots = "0.3"
+
+[build-dependencies]
+winres = "0.1"

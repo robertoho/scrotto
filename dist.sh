@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Distribution Package Builder for Screen Text Grabber
+# Distribution Package Builder for Scrotto
 # Creates a ready-to-install package for publishing
 
 set -e
@@ -14,12 +14,12 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Package info
-PACKAGE_NAME="screen-text-grabber"
+PACKAGE_NAME="scrotto"
 VERSION=$(grep '^version' Cargo.toml | cut -d'"' -f2)
 DIST_DIR="dist"
 PACKAGE_DIR="$DIST_DIR/$PACKAGE_NAME-$VERSION"
 
-echo -e "${CYAN}📦 Screen Text Grabber Distribution Builder${NC}"
+echo -e "${CYAN}📦 Scrotto Distribution Builder${NC}"
 echo "=========================================="
 echo -e "${BLUE}Version: $VERSION${NC}"
 echo ""
@@ -34,14 +34,14 @@ echo -e "${BLUE}🔨 Building release binary...${NC}"
 cargo build --release
 
 # Check if binary exists
-if [[ ! -f "target/release/screen_text_grabber" ]]; then
+if [[ ! -f "target/release/scrotto" ]]; then
     echo -e "${RED}❌ Build failed - binary not found${NC}"
     exit 1
 fi
 
 # Copy binary
 echo -e "${BLUE}📁 Copying files...${NC}"
-cp target/release/screen_text_grabber "$PACKAGE_DIR/"
+cp target/release/scrotto "$PACKAGE_DIR/"
 
 # Copy documentation
 cp README.md "$PACKAGE_DIR/"
@@ -52,7 +52,7 @@ echo -e "${BLUE}📝 Creating installation script...${NC}"
 cat > "$PACKAGE_DIR/install.sh" << 'EOF'
 #!/bin/bash
 
-# Screen Text Grabber - Installation Script
+# Scrotto - Installation Script
 # Installs the binary and sets up desktop entry
 
 set -e
@@ -69,20 +69,20 @@ print_info() { echo -e "${BLUE}ℹ️  $1${NC}"; }
 print_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 print_error() { echo -e "${RED}❌ $1${NC}"; }
 
-echo -e "${BLUE}📸 Installing Screen Text Grabber for Ubuntu${NC}"
-echo "=============================================="
+echo -e "${BLUE}📸 Installing Scrotto for Ubuntu${NC}"
+echo "=================================="
 
 # Check if binary exists
-if [[ ! -f "screen_text_grabber" ]]; then
-    print_error "screen_text_grabber binary not found in current directory"
+if [[ ! -f "scrotto" ]]; then
+    print_error "scrotto binary not found in current directory"
     exit 1
 fi
 
 # Install binary
 print_info "Installing binary to ~/.local/bin"
 mkdir -p ~/.local/bin
-cp screen_text_grabber ~/.local/bin/
-chmod +x ~/.local/bin/screen_text_grabber
+cp scrotto ~/.local/bin/
+chmod +x ~/.local/bin/scrotto
 
 # Add to PATH if needed
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
@@ -95,11 +95,11 @@ fi
 print_info "Creating desktop entry"
 mkdir -p ~/.local/share/applications
 
-cat > ~/.local/share/applications/screen-text-grabber.desktop << EOD
+cat > ~/.local/share/applications/scrotto.desktop << EOD
 [Desktop Entry]
-Name=Screen Text Grabber
+Name=Scrotto
 Comment=Capture screen area and extract text with OCR
-Exec=$HOME/.local/bin/screen_text_grabber
+Exec=$HOME/.local/bin/scrotto
 Icon=applications-graphics
 Terminal=false
 Type=Application
@@ -116,14 +116,14 @@ fi
 print_status "Installation completed successfully!"
 echo ""
 print_info "Usage:"
-echo "  screen_text_grabber           # Select area to capture text"
-echo "  screen_text_grabber --full    # Capture entire screen"
+echo "  scrotto           # Select area to capture text"
+echo "  scrotto --full    # Capture entire screen"
 echo ""
 print_info "Set up keyboard shortcuts:"
 echo "  1. Go to Settings > Keyboard > View and Customize Shortcuts"
 echo "  2. Scroll to 'Custom Shortcuts' and click '+'"
-echo "  3. Name: Screen Text Grabber"
-echo "  4. Command: $HOME/.local/bin/screen_text_grabber"
+echo "  3. Name: Scrotto"
+echo "  4. Command: $HOME/.local/bin/scrotto"
 echo "  5. Set your preferred shortcut (e.g., Shift+Super+T)"
 echo ""
 print_info "Requirements (install if needed):"
@@ -138,7 +138,7 @@ echo -e "${BLUE}🗑️  Creating uninstall script...${NC}"
 cat > "$PACKAGE_DIR/uninstall.sh" << 'EOF'
 #!/bin/bash
 
-# Screen Text Grabber - Uninstall Script
+# Scrotto - Uninstall Script
 
 set -e
 
@@ -153,20 +153,20 @@ print_status() { echo -e "${GREEN}✅ $1${NC}"; }
 print_info() { echo -e "${BLUE}ℹ️  $1${NC}"; }
 print_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 
-echo -e "${BLUE}🗑️  Uninstalling Screen Text Grabber${NC}"
-echo "===================================="
+echo -e "${BLUE}🗑️  Uninstalling Scrotto${NC}"
+echo "========================"
 
 # Remove binary
-if [[ -f "$HOME/.local/bin/screen_text_grabber" ]]; then
-    rm "$HOME/.local/bin/screen_text_grabber"
+if [[ -f "$HOME/.local/bin/scrotto" ]]; then
+    rm "$HOME/.local/bin/scrotto"
     print_status "Removed binary from ~/.local/bin"
 else
     print_warning "Binary not found in ~/.local/bin"
 fi
 
 # Remove desktop entry
-if [[ -f "$HOME/.local/share/applications/screen-text-grabber.desktop" ]]; then
-    rm "$HOME/.local/share/applications/screen-text-grabber.desktop"
+if [[ -f "$HOME/.local/share/applications/scrotto.desktop" ]]; then
+    rm "$HOME/.local/share/applications/scrotto.desktop"
     print_status "Removed desktop entry"
     
     # Update desktop database if available
@@ -180,7 +180,7 @@ fi
 # Note about keyboard shortcuts
 print_info "Manual cleanup needed:"
 echo "  • Remove custom keyboard shortcuts from Settings > Keyboard"
-echo "  • Custom shortcuts pointing to screen_text_grabber"
+echo "  • Custom shortcuts pointing to scrotto"
 
 print_status "Uninstallation completed!"
 EOF
@@ -190,7 +190,7 @@ chmod +x "$PACKAGE_DIR/uninstall.sh"
 # Create a simple README for the package
 echo -e "${BLUE}📄 Creating package README...${NC}"
 cat > "$PACKAGE_DIR/INSTALL.md" << 'EOF'
-# Screen Text Grabber - Installation
+# Scrotto - Installation
 
 ## Quick Install
 
@@ -205,8 +205,8 @@ chmod +x install.sh
 1. Copy the binary to your local bin directory:
    ```bash
    mkdir -p ~/.local/bin
-   cp screen_text_grabber ~/.local/bin/
-   chmod +x ~/.local/bin/screen_text_grabber
+   cp scrotto ~/.local/bin/
+   chmod +x ~/.local/bin/scrotto
    ```
 
 2. Add `~/.local/bin` to your PATH if needed:
@@ -217,7 +217,7 @@ chmod +x install.sh
 
 3. Set up keyboard shortcuts in Ubuntu Settings:
    - Settings > Keyboard > View and Customize Shortcuts
-   - Add custom shortcut with command: `screen_text_grabber`
+   - Add custom shortcut with command: `scrotto`
 
 ## Requirements
 
@@ -228,8 +228,8 @@ sudo apt install gnome-screenshot tesseract-ocr tesseract-ocr-eng
 
 ## Usage
 
-- `screen_text_grabber` - Select area and extract text
-- `screen_text_grabber --full` - Capture full screen
+- `scrotto` - Select area and extract text
+- `scrotto --full` - Capture full screen
 
 ## Uninstall
 

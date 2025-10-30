@@ -6,7 +6,7 @@ use notify_rust::Notification;
 
 fn copy_to_clipboard(text: &str) -> bool {
     // Try Rust clipboard library first
-    if let Ok(mut ctx) = ClipboardProvider::new() {
+    if let Ok(ctx) = ClipboardProvider::new() {
         let mut ctx: ClipboardContext = ctx;
         if ctx.set_contents(text.to_string()).is_ok() {
             return true;
@@ -28,14 +28,15 @@ fn copy_to_clipboard(text: &str) -> bool {
     
     // Fallback to X11 clipboard (xclip)
     if command_exists("xclip") {
-        let mut cmd = Command::new("xclip")
+        let cmd = Command::new("xclip")
             .args(["-selection", "clipboard"])
             .stdin(Stdio::piped())
             .spawn();
         
         if let Ok(mut child) = cmd {
-            if let Some(stdin) = child.stdin.as_mut() {
+            if let Some(stdin) = child.stdin.take() {
                 use std::io::Write;
+                let mut stdin = stdin;
                 if stdin.write_all(text.as_bytes()).is_ok() {
                     drop(stdin);
                     if let Ok(status) = child.wait() {
@@ -50,14 +51,15 @@ fn copy_to_clipboard(text: &str) -> bool {
     
     // Fallback to xsel
     if command_exists("xsel") {
-        let mut cmd = Command::new("xsel")
+        let cmd = Command::new("xsel")
             .args(["--clipboard", "--input"])
             .stdin(Stdio::piped())
             .spawn();
         
         if let Ok(mut child) = cmd {
-            if let Some(stdin) = child.stdin.as_mut() {
+            if let Some(stdin) = child.stdin.take() {
                 use std::io::Write;
+                let mut stdin = stdin;
                 if stdin.write_all(text.as_bytes()).is_ok() {
                     drop(stdin);
                     if let Ok(status) = child.wait() {
@@ -82,9 +84,9 @@ fn main() {
     let fullscreen = args.len() > 1 && (args[1] == "--full" || args[1] == "-f");
 
     if fullscreen {
-        println!("📸 Screen Text Grabber - Capturing full screen");
+        println!("📸 Scrotto - Capturing full screen");
     } else {
-        println!("📸 Screen Text Grabber - Select an area to capture text");
+        println!("📸 Scrotto - Select an area to capture text");
         println!("💡 Use --full or -f flag to capture entire screen");
     }
 
@@ -115,7 +117,7 @@ fn main() {
         println!("❌ No text detected in the selected area.");
         
         Notification::new()
-            .summary("Screen Text Grabber")
+            .summary("Scrotto")
             .body("❌ No text found in selected area\n\nTip: Make sure the area contains clear, readable text")
             .timeout(notify_rust::Timeout::Milliseconds(4000))
             .show()
@@ -138,7 +140,7 @@ fn main() {
     if clipboard_success {
         // Show desktop notification with extracted text
         Notification::new()
-            .summary("Screen Text Grabber")
+            .summary("Scrotto")
             .body(&format!("✅ Text copied to clipboard:\n\n{}", preview_text))
             .timeout(notify_rust::Timeout::Milliseconds(5000))
             .show()
@@ -148,7 +150,7 @@ fn main() {
     } else {
         // Show notification even if clipboard failed
         Notification::new()
-            .summary("Screen Text Grabber")  
+            .summary("Scrotto")  
             .body(&format!("❌ Clipboard failed, but text extracted:\n\n{}", preview_text))
             .timeout(notify_rust::Timeout::Milliseconds(5000))
             .show()

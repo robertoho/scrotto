@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Screen Text Grabber - Uninstall Script
+# Scrotto - Uninstall Script
 
 set -e
 
@@ -15,20 +15,20 @@ print_status() { echo -e "${GREEN}✅ $1${NC}"; }
 print_info() { echo -e "${BLUE}ℹ️  $1${NC}"; }
 print_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 
-echo -e "${BLUE}🗑️  Uninstalling Screen Text Grabber${NC}"
-echo "===================================="
+echo -e "${BLUE}🗑️  Uninstalling Scrotto${NC}"
+echo "========================"
 
 # Remove binary
-if [[ -f "$HOME/.local/bin/screen_text_grabber" ]]; then
-    rm "$HOME/.local/bin/screen_text_grabber"
+if [[ -f "$HOME/.local/bin/scrotto" ]]; then
+    rm "$HOME/.local/bin/scrotto"
     print_status "Removed binary from ~/.local/bin"
 else
     print_warning "Binary not found in ~/.local/bin"
 fi
 
 # Remove desktop entry
-if [[ -f "$HOME/.local/share/applications/screen-text-grabber.desktop" ]]; then
-    rm "$HOME/.local/share/applications/screen-text-grabber.desktop"
+if [[ -f "$HOME/.local/share/applications/scrotto.desktop" ]]; then
+    rm "$HOME/.local/share/applications/scrotto.desktop"
     print_status "Removed desktop entry"
     
     # Update desktop database if available
@@ -42,6 +42,6 @@ fi
 # Note about keyboard shortcuts
 print_info "Manual cleanup needed:"
 echo "  • Remove custom keyboard shortcuts from Settings > Keyboard"
-echo "  • Custom shortcuts pointing to screen_text_grabber"
+echo "  • Custom shortcuts pointing to scrotto"
 
 print_status "Uninstallation completed!"

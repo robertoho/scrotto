@@ -1,4 +1,4 @@
-# Screen Text Grabber - Installation
+# Scrotto - Installation
 
 ## Quick Install
 
@@ -13,8 +13,8 @@ chmod +x install.sh
 1. Copy the binary to your local bin directory:
    ```bash
    mkdir -p ~/.local/bin
-   cp screen_text_grabber ~/.local/bin/
-   chmod +x ~/.local/bin/screen_text_grabber
+   cp scrotto ~/.local/bin/
+   chmod +x ~/.local/bin/scrotto
    ```
 
 2. Add `~/.local/bin` to your PATH if needed:
@@ -25,7 +25,7 @@ chmod +x install.sh
 
 3. Set up keyboard shortcuts in Ubuntu Settings:
    - Settings > Keyboard > View and Customize Shortcuts
-   - Add custom shortcut with command: `screen_text_grabber`
+   - Add custom shortcut with command: `scrotto`
 
 ## Requirements
 
@@ -36,8 +36,8 @@ sudo apt install gnome-screenshot tesseract-ocr tesseract-ocr-eng
 
 ## Usage
 
-- `screen_text_grabber` - Select area and extract text
-- `screen_text_grabber --full` - Capture full screen
+- `scrotto` - Select area and extract text
+- `scrotto --full` - Capture full screen
 
 ## Uninstall
 
