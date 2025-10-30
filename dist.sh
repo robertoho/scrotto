@@ -114,7 +114,7 @@ if command -v update-desktop-database >/dev/null 2>&1; then
 fi
 
 # Set up keyboard shortcut automatically
-print_info "Setting up keyboard shortcut (Shift+Super+T)"
+print_info "Setting up keyboard shortcut (Shift+Super+A)"
 setup_keyboard_shortcut() {
     # Check if we're in a GNOME environment
     if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* ]] || command -v gsettings >/dev/null 2>&1; then
@@ -148,9 +148,9 @@ setup_keyboard_shortcut() {
             # Set the keybinding properties
             gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$keybinding_path name "Scrotto"
             gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$keybinding_path command "$HOME/.local/bin/scrotto"
-            gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$keybinding_path binding "<Shift><Super>t"
+            gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$keybinding_path binding "<Shift><Super>a"
             
-            print_status "Keyboard shortcut created: Shift+Super+T"
+            print_status "Keyboard shortcut created: Shift+Super+A"
             return 0
         else
             print_warning "No available keybinding slots found"
@@ -169,7 +169,7 @@ if ! setup_keyboard_shortcut; then
     echo "  2. Scroll to 'Custom Shortcuts' and click '+'"
     echo "  3. Name: Scrotto"
     echo "  4. Command: $HOME/.local/bin/scrotto"
-    echo "  5. Set shortcut: Shift+Super+T"
+    echo "  5. Set shortcut: Shift+Super+A"
 fi
 
 print_status "Installation completed successfully!"
@@ -177,7 +177,7 @@ echo ""
 print_info "Usage:"
 echo "  scrotto           # Select area to capture text"
 echo "  scrotto --full    # Capture entire screen"
-echo "  Shift+Super+T     # Keyboard shortcut (if setup succeeded)"
+echo "  Shift+Super+A     # Keyboard shortcut (if setup succeeded)"
 echo ""
 print_info "Requirements (install if needed):"
 echo "  • sudo apt install gnome-screenshot tesseract-ocr"
@@ -307,7 +307,7 @@ chmod +x install.sh
    ```
 
 3. Keyboard shortcut (automatic setup):
-   - The installer will automatically create Shift+Super+T shortcut
+   - The installer will automatically create Shift+Super+A shortcut
    - If automatic setup fails, manually add in Settings > Keyboard
 
 ## Requirements
