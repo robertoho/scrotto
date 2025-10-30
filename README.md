@@ -14,19 +14,29 @@ A fast and efficient screen text grabber for **Wayland** that captures selected 
 
 ## 🚀 Quick Start
 
-### Option 1: Full Setup with Keyboard Shortcuts
+### Installation from Release Package
 ```bash
-# Automatic setup (recommended)
-./universal_setup.sh
+# Download and extract the latest release
+wget https://github.com/robertoho/scrotto/releases/download/v0.1.0/scrotto-0.1.0.tar.gz
+tar -xzf scrotto-0.1.0.tar.gz
+cd scrotto-0.1.0
+
+# Run the installer (sets up binary, desktop entry, and keyboard shortcut)
+./install.sh
 ```
 
-### Option 2: Manual Installation
+### Build and Install from Source
 ```bash
-# Build and install manually
-./install.sh
+# Clone the repository
+git clone https://github.com/robertoho/scrotto.git
+cd scrotto
 
-# Set up shortcuts
-./manual_setup.sh  # Shows instructions for your desktop
+# Build the release package
+./dist.sh
+
+# Install from the generated package
+cd dist/scrotto-0.1.0
+./install.sh
 ```
 
 ### Usage
@@ -34,17 +44,20 @@ A fast and efficient screen text grabber for **Wayland** that captures selected 
 scrotto           # Select area to capture
 scrotto --full    # Capture full screen
 
-# Or use keyboard shortcuts (after setup):
-# Shift+Super+T        → Area selection
-# Shift+Super+Alt+T    → Full screen
+# Keyboard shortcut (automatically set up by installer):
+# Shift+Super+T    → Area selection
 ```
 
 ## 🔧 Requirements
 
 **This application requires a Wayland session.** It will not work on X11.
 
-The application automatically detects and works with:
+The installer automatically sets up:
+- Binary in `~/.local/bin/scrotto`
+- Desktop entry for application launcher
+- Keyboard shortcut (Shift+Super+T) on GNOME
 
+Required system packages:
 - **Wayland Display Server** (required)
 - **GNOME Screenshot** or **grim + slurp** (for capturing)
 - **wl-clipboard** (for clipboard support)
@@ -78,35 +91,23 @@ sudo apt install grim slurp wl-clipboard tesseract-ocr
 - Extracts all visible text
 - Useful for capturing terminal output, documents, etc.
 
-## ⌨️ Keyboard Shortcut Setup
+## ⌨️ Keyboard Shortcut
 
-### 🚀 Automatic Setup (Recommended)
-```bash
-# Universal setup - works on most Ubuntu variants
-./universal_setup.sh
+The installer automatically sets up `Shift+Super+T` for area selection on GNOME.
 
-# GNOME-specific setup (Ubuntu Desktop)
-./setup_shortcuts_simple.sh
-```
-
-### 🔧 Manual Setup
-```bash
-# Show step-by-step instructions for your desktop
-./manual_setup.sh
-```
-
-### 📋 Manual Steps (GNOME/Ubuntu Desktop)
+### Manual Setup (if automatic setup fails)
 1. Open **Settings** → **Keyboard** → **View and Customize Shortcuts**
 2. Scroll to **Custom Shortcuts** → Click **+**
-3. Add shortcuts:
-   - **Name**: Scrotto - Area
+3. Add shortcut:
+   - **Name**: Scrotto
    - **Command**: `~/.local/bin/scrotto`
    - **Shortcut**: `Shift+Super+T`
-   
-4. Add second shortcut:
-   - **Name**: Scrotto - Full Screen  
-   - **Command**: `~/.local/bin/scrotto --full`
-   - **Shortcut**: `Shift+Super+Alt+T`
+
+### Uninstall
+```bash
+# Run the uninstaller from the package directory
+./uninstall.sh
+```
 
 ## 🛠️ Technical Details
 
