@@ -4,19 +4,24 @@ use std::fs;
 use clipboard::{ClipboardContext, ClipboardProvider};
 use notify_rust::Notification;
 
-fn copy_to_clipboard(text: &str) -> bool {
-    // Try Rust clipboard library first
-    if let Ok(ctx) = ClipboardProvider::new() {
-        let mut ctx: ClipboardContext = ctx;
-        if ctx.set_contents(text.to_string()).is_ok() {
-            return true;
+fn show_notification(title: &str, message: &str) -> bool {
+    // Try notify-rust first
+    match Notification::new()
+        .summary(title)
+        .body(message)
+        .timeout(notify_rust::Timeout::Milliseconds(5000))
+        .show() {
+        Ok(_) => return true,
+        Err(e) => {
+            eprintln!("⚠️  notify-rust failed: {}", e);
         }
     }
     
-    // Fallback to native Wayland clipboard (wl-copy)
-    if command_exists("wl-copy") {
-        let status = Command::new("wl-copy")
-            .arg(text)
+    // Fallback to notify-send command
+    if command_exists("notify-send") {
+        let status = Command::new("notify-send")
+            .arg(title)
+            .arg(message)
             .status();
         
         if let Ok(status) = status {
@@ -26,58 +31,59 @@ fn copy_to_clipboard(text: &str) -> bool {
         }
     }
     
-    // Fallback to X11 clipboard (xclip)
-    if command_exists("xclip") {
-        let cmd = Command::new("xclip")
-            .args(["-selection", "clipboard"])
-            .stdin(Stdio::piped())
-            .spawn();
+    eprintln!("⚠️  All notification methods failed");
+    false
+}
+
+fn copy_to_clipboard(text: &str) -> bool {
+    // Try wl-copy (Wayland clipboard utility)
+    if command_exists("wl-copy") {
+        let status = Command::new("wl-copy")
+            .arg(text)
+            .status();
         
-        if let Ok(mut child) = cmd {
-            if let Some(stdin) = child.stdin.take() {
-                use std::io::Write;
-                let mut stdin = stdin;
-                if stdin.write_all(text.as_bytes()).is_ok() {
-                    drop(stdin);
-                    if let Ok(status) = child.wait() {
-                        if status.success() {
-                            return true;
-                        }
+        if let Ok(status) = status {
+            if status.success() {
+                // Verify it worked by reading it back
+                if let Ok(output) = Command::new("wl-paste").output() {
+                    let pasted_text = String::from_utf8_lossy(&output.stdout);
+                    if pasted_text.trim() == text.trim() {
+                        return true;
                     }
                 }
             }
         }
     }
     
-    // Fallback to xsel
-    if command_exists("xsel") {
-        let cmd = Command::new("xsel")
-            .args(["--clipboard", "--input"])
-            .stdin(Stdio::piped())
-            .spawn();
-        
-        if let Ok(mut child) = cmd {
-            if let Some(stdin) = child.stdin.take() {
-                use std::io::Write;
-                let mut stdin = stdin;
-                if stdin.write_all(text.as_bytes()).is_ok() {
-                    drop(stdin);
-                    if let Ok(status) = child.wait() {
-                        if status.success() {
-                            return true;
-                        }
-                    }
+    // Try Rust clipboard library (supports Wayland)
+    if let Ok(ctx) = ClipboardProvider::new() {
+        let mut ctx: ClipboardContext = ctx;
+        if ctx.set_contents(text.to_string()).is_ok() {
+            // Try to verify it worked
+            if let Ok(contents) = ctx.get_contents() {
+                if contents.trim() == text.trim() {
+                    return true;
                 }
             }
         }
     }
     
+    eprintln!("❌ Failed to copy to clipboard. Make sure wl-clipboard is installed:");
+    eprintln!("   sudo apt install wl-clipboard");
     false
 }
 
 fn main() {
+    // Ensure we're running on Wayland
+    let session_type = env::var("XDG_SESSION_TYPE").unwrap_or_else(|_| String::from("unknown"));
+    if session_type != "wayland" {
+        eprintln!("❌ Scrotto requires a Wayland session");
+        eprintln!("   Current session type: {}", session_type);
+        eprintln!("   Please run this application in a Wayland environment");
+        std::process::exit(1);
+    }
+
     let args: Vec<String> = env::args().collect();
-    let session_type = env::var("XDG_SESSION_TYPE").unwrap_or_else(|_| "x11".into());
     let tmpfile = "/tmp/screen_grab.png";
 
     // Check for fullscreen flag
@@ -90,14 +96,10 @@ fn main() {
         println!("💡 Use --full or -f flag to capture entire screen");
     }
 
-    let success = if session_type == "wayland" {
-        if fullscreen {
-            capture_wayland_fullscreen(tmpfile)
-        } else {
-            capture_wayland(tmpfile)
-        }
+    let success = if fullscreen {
+        capture_wayland_fullscreen(tmpfile)
     } else {
-        capture_x11(tmpfile)
+        capture_wayland(tmpfile)
     };
 
     if !success {
@@ -116,12 +118,7 @@ fn main() {
     if text.is_empty() {
         println!("❌ No text detected in the selected area.");
         
-        Notification::new()
-            .summary("Scrotto")
-            .body("❌ No text found in selected area\n\nTip: Make sure the area contains clear, readable text")
-            .timeout(notify_rust::Timeout::Milliseconds(4000))
-            .show()
-            .unwrap();
+        show_notification("Scrotto", "❌ No text found in selected area\n\nTip: Make sure the area contains clear, readable text");
         
         let _ = fs::remove_file(tmpfile);
         return;
@@ -131,31 +128,20 @@ fn main() {
     let clipboard_success = copy_to_clipboard(&text);
     
     // Prepare notification text (limit length for better display)
-    let preview_text = if text.len() > 100 {
-        format!("{}...", &text[..100])
+    let preview_text = if text.chars().count() > 100 {
+        let truncated: String = text.chars().take(100).collect();
+        format!("{}...", truncated)
     } else {
         text.clone()
     };
 
     if clipboard_success {
         // Show desktop notification with extracted text
-        Notification::new()
-            .summary("Scrotto")
-            .body(&format!("✅ Text copied to clipboard:\n\n{}", preview_text))
-            .timeout(notify_rust::Timeout::Milliseconds(5000))
-            .show()
-            .unwrap();
-
+        show_notification("Scrotto", &format!("✅ Text copied to clipboard:\n\n{}", preview_text));
         println!("✅ Text copied to clipboard:\n{}", text);
     } else {
         // Show notification even if clipboard failed
-        Notification::new()
-            .summary("Scrotto")  
-            .body(&format!("❌ Clipboard failed, but text extracted:\n\n{}", preview_text))
-            .timeout(notify_rust::Timeout::Milliseconds(5000))
-            .show()
-            .unwrap();
-
+        show_notification("Scrotto", &format!("❌ Clipboard failed, but text extracted:\n\n{}", preview_text));
         println!("❌ Failed to copy to clipboard, but text extracted:\n{}", text);
         println!("💡 You can manually copy this text from the terminal");
     }
@@ -282,101 +268,6 @@ fn capture_wayland(tmpfile: &str) -> bool {
     eprintln!("❌ No compatible Wayland screenshot tools found!");
     eprintln!("💡 For GNOME Wayland: sudo apt install gnome-screenshot");
     eprintln!("💡 For wlroots compositors: sudo apt install slurp grim");
-    false
-}
-
-fn capture_x11(tmpfile: &str) -> bool {
-    // Try different X11 screenshot tools in order of preference
-    
-    // First try gnome-screenshot (most common on Ubuntu)
-    if command_exists("gnome-screenshot") {
-        println!("🖱️  Select area with your mouse (press and drag)");
-        let status = Command::new("gnome-screenshot")
-            .args(["-a", "-f", tmpfile])
-            .status();
-        
-        if let Ok(status) = status {
-            if status.success() && std::path::Path::new(tmpfile).exists() {
-                return true;
-            }
-        }
-    }
-    
-    // Try flameshot (provides overlay)
-    if command_exists("flameshot") {
-        println!("🖱️  Use Flameshot overlay to select area and save");
-        let status = Command::new("flameshot")
-            .args(["gui", "-p", tmpfile])
-            .status();
-        
-        if let Ok(status) = status {
-            if status.success() && std::path::Path::new(tmpfile).exists() {
-                return true;
-            }
-        }
-    }
-    
-    // Try maim with slop for area selection
-    if command_exists("maim") && command_exists("slop") {
-        println!("🖱️  Select area with your mouse (drag to select)");
-        
-        let slop_output = Command::new("slop")
-            .args(["-f", "%x,%y,%w,%h"])
-            .stdout(Stdio::piped())
-            .stderr(Stdio::null())
-            .output();
-        
-        if let Ok(slop_result) = slop_output {
-            let geometry = String::from_utf8_lossy(&slop_result.stdout).trim().to_string();
-            
-            if !geometry.is_empty() {
-                let coords: Vec<&str> = geometry.split(',').collect();
-                if coords.len() == 4 {
-                    let geometry_arg = format!("{}x{}+{}+{}", coords[2], coords[3], coords[0], coords[1]);
-                    
-                    let status = Command::new("maim")
-                        .args(["-g", &geometry_arg, tmpfile])
-                        .status();
-                    
-                    if let Ok(status) = status {
-                        return status.success() && std::path::Path::new(tmpfile).exists();
-                    }
-                }
-            }
-        }
-    }
-    
-    // Fallback to maim with interactive selection
-    if command_exists("maim") {
-        println!("🖱️  Click and drag to select area");
-        let status = Command::new("maim")
-            .args(["-s", tmpfile])
-            .status();
-        
-        if let Ok(status) = status {
-            return status.success() && std::path::Path::new(tmpfile).exists();
-        }
-    }
-    
-    // Final fallback to scrot
-    if command_exists("scrot") {
-        println!("🖱️  Click and drag to select area");
-        let status = Command::new("scrot")
-            .args(["-s", tmpfile])
-            .status();
-        
-        if let Ok(status) = status {
-            return status.success() && std::path::Path::new(tmpfile).exists();
-        }
-    }
-    
-    eprintln!("❌ No suitable screenshot tool found!");
-    eprintln!("Install one of these tools:");
-    eprintln!("  sudo apt install gnome-screenshot  # (recommended for Ubuntu)");
-    eprintln!("  sudo apt install flameshot         # (best overlay experience)");
-    eprintln!("  sudo apt install maim slop         # (lightweight option)");
-    eprintln!("  sudo apt install scrot             # (fallback option)");
-    
     false
 }
 

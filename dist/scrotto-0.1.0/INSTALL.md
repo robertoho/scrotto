@@ -23,9 +23,9 @@ chmod +x install.sh
    source ~/.bashrc
    ```
 
-3. Set up keyboard shortcuts in Ubuntu Settings:
-   - Settings > Keyboard > View and Customize Shortcuts
-   - Add custom shortcut with command: `scrotto`
+3. Keyboard shortcut (automatic setup):
+   - The installer will automatically create Shift+Super+T shortcut
+   - If automatic setup fails, manually add in Settings > Keyboard
 
 ## Requirements
 

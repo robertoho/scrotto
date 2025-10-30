@@ -1,12 +1,12 @@
 # Scrotto
 
-A fast and efficient screen text grabber for Ubuntu Wayland that captures selected areas and extracts text using OCR.
+A fast and efficient screen text grabber for **Wayland** that captures selected areas and extracts text using OCR.
 
 ## ✨ Features
 
+- **Wayland-Only**: Designed specifically for Wayland display server
 - **Area Selection**: Interactive overlay to select specific screen areas
 - **Full Screen Capture**: Capture entire screen with `--full` flag
-- **Wayland Native**: Optimized for Ubuntu Wayland using gnome-screenshot
 - **Fast OCR**: Uses Tesseract for accurate text recognition
 - **Clipboard Integration**: Automatically copies extracted text to clipboard
 - **Desktop Notifications**: Shows success/failure notifications
@@ -41,11 +41,23 @@ scrotto --full    # Capture full screen
 
 ## 🔧 Requirements
 
+**This application requires a Wayland session.** It will not work on X11.
+
 The application automatically detects and works with:
 
-- **Ubuntu Wayland** (primary target)
-- **gnome-screenshot** (for area selection overlay)
+- **Wayland Display Server** (required)
+- **GNOME Screenshot** or **grim + slurp** (for capturing)
+- **wl-clipboard** (for clipboard support)
 - **tesseract-ocr** (for text extraction)
+
+### Installation
+```bash
+# For GNOME/Ubuntu Wayland
+sudo apt install gnome-screenshot wl-clipboard tesseract-ocr
+
+# For wlroots-based compositors (Sway, Hyprland, etc.)
+sudo apt install grim slurp wl-clipboard tesseract-ocr
+```
 
 ## 📖 Usage Examples
 
@@ -99,9 +111,10 @@ The application automatically detects and works with:
 ## 🛠️ Technical Details
 
 ### Wayland Compatibility
-- Uses `gnome-screenshot` for GNOME Wayland (Ubuntu default)
-- Fallback to `grim + slurp` for wlroots-based compositors
-- Automatic session detection and tool selection
+- **GNOME**: Uses `gnome-screenshot` for area selection
+- **wlroots compositors** (Sway, Hyprland, etc.): Uses `grim + slurp`
+- Automatic compositor detection and tool selection
+- Session validation ensures Wayland-only operation
 
 ### OCR Configuration
 - English language by default (`-l eng`)
@@ -118,17 +131,21 @@ screenshots = "0.3"    # Cross-platform screenshot support
 
 ## 🔍 Troubleshooting
 
+### App refuses to start
+- Ensure you're running Wayland: `echo $XDG_SESSION_TYPE` should return `wayland`
+- If running X11, switch to a Wayland session
+
 ### No overlay appears
-- Ensure `gnome-screenshot` is installed: `sudo apt install gnome-screenshot`
-- Check Wayland session: `echo $XDG_SESSION_TYPE`
+- **GNOME**: Install `gnome-screenshot`: `sudo apt install gnome-screenshot`
+- **Other compositors**: Install `grim` and `slurp`: `sudo apt install grim slurp`
 
 ### OCR not working
 - Install tesseract: `sudo apt install tesseract-ocr tesseract-ocr-eng`
 - For other languages: `sudo apt install tesseract-ocr-[language]`
 
-### Permission issues
-- Make sure binary is executable: `chmod +x scrotto`
-- Check clipboard permissions in Wayland
+### Clipboard not working
+- Install wl-clipboard: `sudo apt install wl-clipboard`
+- Verify wl-copy is available: `which wl-copy`
 
 ## 📝 Build from Source
 

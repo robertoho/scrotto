@@ -87,8 +87,8 @@ setup_keyboard_shortcut() {
                     # Empty list
                     gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$keybinding_path']"
                 else
-                    # Add to existing list - remove the closing bracket, add our path, then add the bracket back
-                    local new_bindings="${current_bindings%]*}, '$keybinding_path']"
+                    # Add to existing list
+                    local new_bindings="${current_bindings%]}, '$keybinding_path']"
                     gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_bindings"
                 fi
             fi
