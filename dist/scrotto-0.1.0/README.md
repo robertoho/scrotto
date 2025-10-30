@@ -1,4 +1,4 @@
-c# Scrotto
+# Scrotto
 
 A fast and efficient screen text grabber for **Wayland** that captures selected areas and extracts text using OCR.
 
@@ -45,7 +45,7 @@ scrotto           # Select area to capture
 scrotto --full    # Capture full screen
 
 # Keyboard shortcut (automatically set up by installer):
-# Shift+Super+A    → Area selection
+# Shift+Super+T    → Area selection
 ```
 
 ## 🔧 Requirements
@@ -55,7 +55,7 @@ scrotto --full    # Capture full screen
 The installer automatically sets up:
 - Binary in `~/.local/bin/scrotto`
 - Desktop entry for application launcher
-- Keyboard shortcut (Shift+Super+A) on GNOME
+- Keyboard shortcut (Shift+Super+T) on GNOME
 
 Required system packages:
 - **Wayland Display Server** (required)
@@ -93,7 +93,7 @@ sudo apt install grim slurp wl-clipboard tesseract-ocr
 
 ## ⌨️ Keyboard Shortcut
 
-The installer automatically sets up `Shift+Super+A` for area selection on GNOME.
+The installer automatically sets up `Shift+Super+T` for area selection on GNOME.
 
 ### Manual Setup (if automatic setup fails)
 1. Open **Settings** → **Keyboard** → **View and Customize Shortcuts**
@@ -101,7 +101,7 @@ The installer automatically sets up `Shift+Super+A` for area selection on GNOME.
 3. Add shortcut:
    - **Name**: Scrotto
    - **Command**: `~/.local/bin/scrotto`
-   - **Shortcut**: `Shift+Super+A`
+   - **Shortcut**: `Shift+Super+T`
 
 ### Uninstall
 ```bash

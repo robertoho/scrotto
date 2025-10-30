@@ -1,0 +1,10 @@
+[package]
+name = "scrotto"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clipboard = "0.5"
+notify-rust = "4"
+screenshots = "0.3"
+    
