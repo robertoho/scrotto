@@ -1,4 +1,4 @@
-c# Scrotto
+Scrotto
 
 A fast and efficient screen text grabber for **Wayland** that captures selected areas and extracts text using OCR.
 
