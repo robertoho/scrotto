@@ -7,4 +7,7 @@ edition = "2021"
 clipboard = "0.5"
 notify-rust = "4"
 screenshots = "0.3"
+anyhow = "1"
+ashpd = { version = "0.6", default-features = false, features = ["tokio"] }
+tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
     
